@@ -16,7 +16,7 @@ public class Game extends JPanel
 {
     private static final int HERO_DIMENSION = 20;
     private static final int HERO_SPEED = 100;
-    private static final int HERO_JUMP = -450;
+    private static final int HERO_JUMP = -500;
     private static final int GRAVITY = 1500;
 
     private ArrayList<DisplayObject> objs;
@@ -27,8 +27,10 @@ public class Game extends JPanel
     private boolean leftPressed = false;
     private boolean rightPressed = false;
     private boolean jumpPressed = false;
-    private boolean canJump = false;
+    private boolean grounded = false;
     private boolean canDoubleJump = false;
+    private boolean touchingWall = false;
+    private boolean jumpedFromWall = false;
 
     public static void main(String[] args) throws InterruptedException
     {
@@ -126,12 +128,17 @@ public class Game extends JPanel
         else
             hero.velX = 0;
 
-        if(jumpPressed && (canJump || canDoubleJump)) {
+        if(jumpPressed && (grounded || canDoubleJump || touchingWall)) {
             jumpPressed = false;
-            if(canJump)
-                canJump = false;
-            else
+            if(grounded)
+                grounded = false;
+            else if(!touchingWall)
                 canDoubleJump = false;
+            else {
+                touchingWall = false;
+                jumpedFromWall = true;
+            }
+
             hero.velY = HERO_JUMP;
         }
 
@@ -144,14 +151,27 @@ public class Game extends JPanel
         if(hero.y + HERO_DIMENSION > ground.y) {
             hero.y = ground.y-HERO_DIMENSION;
             hero.velY = 0;
-            canJump = true;
-            canDoubleJump = true;
+            grounded = true;
+            jumpedFromWall = false;
+            //canDoubleJump = true;
+        }
+
+        if(hero.y < 0) {
+            hero.y = 0;
+            hero.velY = -hero.velY;
         }
 
         if(hero.x < 0)
             hero.x = 0;
         else if(hero.x > getWidth() - HERO_DIMENSION)
             hero.x = getWidth() - HERO_DIMENSION;
+
+        if(jumpedFromWall) {
+            if(hero.x > 0 && hero.x + HERO_DIMENSION < getWidth())
+                jumpedFromWall = false;
+        } else if(hero.x == 0 || hero.x + HERO_DIMENSION == getWidth())
+            touchingWall = true;
+        else touchingWall = false;
 
         repaint();
     }
