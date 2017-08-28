@@ -20,6 +20,7 @@ public class Game extends JPanel
     private static final int GRAVITY = 1500;
 
     private ArrayList<DisplayObject> objs;
+    private ArrayList<DisplayObject> platforms;
 
     private DisplayObject ground;
     private GameObject hero;
@@ -107,6 +108,7 @@ public class Game extends JPanel
         setBackground(Color.BLACK);
 
         objs = new ArrayList<DisplayObject>();
+        platforms = new ArrayList<DisplayObject>();
     }
 
     private void start()
@@ -114,6 +116,7 @@ public class Game extends JPanel
         int groundHeight = 30;
         ground = new DisplayObject(0, getHeight()-groundHeight, getWidth(), groundHeight, Color.WHITE);
         objs.add(ground);
+        platforms.add(ground);
 
         hero = new GameObject(10, getHeight()-groundHeight-HERO_DIMENSION, HERO_DIMENSION, HERO_DIMENSION, Color.GREEN);
         objs.add(hero);
@@ -148,18 +151,21 @@ public class Game extends JPanel
 
         hero.velY += GRAVITY * time;
 
-        if(hero.y + HERO_DIMENSION > ground.y) {
+        /*if(hero.y + HERO_DIMENSION > ground.y) {
             hero.y = ground.y-HERO_DIMENSION;
             hero.velY = 0;
             grounded = true;
             jumpedFromWall = false;
             //canDoubleJump = true;
-        }
+        }*/
 
-        if(hero.y < 0) {
+        /*if(hero.y < 0) {
             hero.y = 0;
             hero.velY = -hero.velY;
-        }
+        }*/
+
+
+        collide();
 
         if(hero.x < 0)
             hero.x = 0;
@@ -174,6 +180,17 @@ public class Game extends JPanel
         else touchingWall = false;
 
         repaint();
+    }
+
+    public void collide() {
+        for(DisplayObject obj : platforms) {
+            if(hero.x < obj.x + obj.width &&
+               hero.x + hero.width > obj.x &&
+               hero.y < obj.y + obj.height &&
+               hero.y + hero.height > obj.y ) {
+                System.out.println("colliding");
+            }
+        }
     }
 
     @Override
