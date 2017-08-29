@@ -118,6 +118,10 @@ public class Game extends JPanel
         objs.add(ground);
         platforms.add(ground);
 
+        DisplayObject platform = new DisplayObject(0, 460, getWidth()/4, groundHeight/2, Color.WHITE);
+        objs.add(platform);
+        platforms.add(platform);
+
         hero = new GameObject(10, getHeight()-groundHeight-HERO_DIMENSION, HERO_DIMENSION, HERO_DIMENSION, Color.GREEN);
         objs.add(hero);
     }
@@ -165,7 +169,13 @@ public class Game extends JPanel
         }*/
 
 
-        collide();
+        if(collide()) {
+            hero.y = ground.y-HERO_DIMENSION;
+            hero.velY = 0;
+            grounded = true;
+            jumpedFromWall = false;
+            //canDoubleJump = true;
+        }
 
         if(hero.x < 0)
             hero.x = 0;
@@ -182,15 +192,20 @@ public class Game extends JPanel
         repaint();
     }
 
-    public void collide() {
+    public boolean collide() {
         for(DisplayObject obj : platforms) {
             if(hero.x < obj.x + obj.width &&
                hero.x + hero.width > obj.x &&
                hero.y < obj.y + obj.height &&
                hero.y + hero.height > obj.y ) {
-                System.out.println("colliding");
+                //System.out.println("colliding");
+                // check witch axis is penetrating more, and separate by it
+
+                return true;
             }
         }
+
+        return false;
     }
 
     @Override
